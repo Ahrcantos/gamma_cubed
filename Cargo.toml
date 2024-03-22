@@ -1,0 +1,16 @@
+[package]
+name = "gamma-cubed"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+anyhow = "1"
+thiserror = "1"
+bytes = "1.4"
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.114"
+uuid = "1.8.0"
