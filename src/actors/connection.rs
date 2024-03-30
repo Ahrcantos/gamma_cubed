@@ -4,6 +4,7 @@ use crate::protocol::{
     packet::{
         disconnect::DisconnectPacket,
         handshake::{HandshakePacket, NextState},
+        ping::PingResponsePacket,
         status::StatusResponsePacket,
     },
     Packet,
@@ -47,10 +48,20 @@ impl ConnectionActor {
                 continue;
             }
 
+            if let Packet::PingRequest(packet) = incoming_packet {
+                let _ = self
+                    .write_packet_handle
+                    .send(Packet::PingResponse(PingResponsePacket::from(packet)))
+                    .await;
+                continue;
+            }
+
             if let Packet::LoginStart(_) = incoming_packet {
                 let _ = self
                     .write_packet_handle
-                    .send(Packet::Disconnect(DisconnectPacket::reason("Please go away")))
+                    .send(Packet::Disconnect(DisconnectPacket::reason(
+                        "Please go away",
+                    )))
                     .await;
                 continue;
             }

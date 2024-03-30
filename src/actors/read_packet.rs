@@ -4,6 +4,7 @@ use tokio::{net::tcp::OwnedReadHalf, sync::mpsc};
 use crate::parser::{Deserialize, Scanner};
 use crate::protocol::packet::handshake::HandshakePacket;
 use crate::protocol::packet::login::LoginStartPacket;
+use crate::protocol::packet::ping::PingRequestPacket;
 use crate::protocol::Packet;
 
 use super::connection::ConnectionState;
@@ -40,6 +41,15 @@ impl ReadPacketActor {
                 if let Ok(lsp) = LoginStartPacket::deserialize(&mut scanner) {
                     self.packet_sender
                         .send(Packet::LoginStart(lsp))
+                        .await
+                        .unwrap();
+                }
+            } else if raw_packet.packet_id() == 0x01 && state == ConnectionState::Status {
+                let mut scanner = Scanner::new(raw_packet.data());
+
+                if let Ok(prp) = PingRequestPacket::deserialize(&mut scanner) {
+                    self.packet_sender
+                        .send(Packet::PingRequest(prp))
                         .await
                         .unwrap();
                 }
