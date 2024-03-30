@@ -1,4 +1,4 @@
-use bytes::BufMut;
+use bytes::{BufMut, BytesMut};
 
 use crate::parser::{Deserialize, ParserError, ParserResult, Scanner, Serialize};
 
@@ -12,6 +12,14 @@ impl VarInt {
 
     pub fn inner(&self) -> i32 {
         self.0
+    }
+
+    pub fn serialized_len(&self) -> usize {
+        // TODO: Replace with a more performant implmentation
+        // that does not allocate a new buffer
+        let mut buffer = BytesMut::new();
+        self.serialize(&mut buffer);
+        buffer.len()
     }
 }
 

@@ -50,7 +50,7 @@ impl ConnectionActor {
             if let Packet::LoginStart(_) = incoming_packet {
                 let _ = self
                     .write_packet_handle
-                    .send(Packet::Disconnect(DisconnectPacket::reason("lu")))
+                    .send(Packet::Disconnect(DisconnectPacket::reason("Please go away")))
                     .await;
                 continue;
             }

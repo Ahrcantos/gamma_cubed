@@ -12,7 +12,9 @@ pub struct RawPacket {
 
 impl RawPacket {
     pub fn new(packet_id: VarInt, data: Bytes) -> Self {
-        let length = VarInt::new(data.len() as i32);
+        let data_length = data.len() as i32;
+        let packet_id_length = packet_id.serialized_len() as i32;
+        let length = VarInt::new(data_length + packet_id_length);
 
         Self {
             packet_id,
