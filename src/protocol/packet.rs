@@ -10,7 +10,7 @@ use crate::parser::Serialize;
 use self::disconnect::DisconnectPacket;
 use self::encryption::EncryptionRequestPacket;
 use self::handshake::HandshakePacket;
-use self::login::LoginStartPacket;
+use self::login::{LoginStartPacket, LoginSuccessPacket};
 use self::status::StatusResponsePacket;
 use self::ping::{PingRequestPacket, PingResponsePacket};
 
@@ -24,6 +24,8 @@ pub enum Packet {
     LoginStart(LoginStartPacket),
     Disconnect(DisconnectPacket),
     EncryptionRequest(EncryptionRequestPacket),
+    LoginSuccess(LoginSuccessPacket),
+    LoginAcknowledged,
 }
 
 impl Packet {
@@ -37,6 +39,8 @@ impl Packet {
             Self::LoginStart(_) => 0,
             Self::Disconnect(_) => 0,
             Self::EncryptionRequest(_) => 1,
+            Self::LoginSuccess(_) => 2,
+            Self::LoginAcknowledged => 3,
         }
     }
 }
@@ -53,7 +57,9 @@ impl Serialize for Packet {
             Self::Disconnect(packet) => packet.serialize(buffer),
             Self::EncryptionRequest(_) => {
                 todo!()
-            }
+            },
+            Self::LoginSuccess(packet) => packet.serialize(buffer),
+            Self::LoginAcknowledged => {},
         }
     }
 }

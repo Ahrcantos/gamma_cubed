@@ -53,6 +53,11 @@ impl ReadPacketActor {
                         .await
                         .unwrap();
                 }
+            } else if raw_packet.packet_id() == 0x03 && state == ConnectionState::Login {
+                self.packet_sender
+                    .send(Packet::LoginAcknowledged)
+                    .await
+                    .unwrap();
             } else {
                 dbg!(raw_packet);
             }

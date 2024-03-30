@@ -2,8 +2,8 @@ use tokio::{net::TcpStream, sync::watch};
 
 use crate::protocol::{
     packet::{
-        disconnect::DisconnectPacket,
         handshake::{HandshakePacket, NextState},
+        login::LoginSuccessPacket,
         ping::PingResponsePacket,
         status::StatusResponsePacket,
     },
@@ -17,6 +17,7 @@ pub enum ConnectionState {
     Handshake,
     Status,
     Login,
+    Configuration,
 }
 
 struct ConnectionActor {
@@ -59,11 +60,14 @@ impl ConnectionActor {
             if let Packet::LoginStart(_) = incoming_packet {
                 let _ = self
                     .write_packet_handle
-                    .send(Packet::Disconnect(DisconnectPacket::reason(
-                        "Please go away",
-                    )))
+                    .send(Packet::LoginSuccess(LoginSuccessPacket::default()))
                     .await;
                 continue;
+            }
+
+            if let Packet::LoginAcknowledged = incoming_packet {
+                let _ = self.connection_state_sender
+                    .send(ConnectionState::Configuration);
             }
         }
     }

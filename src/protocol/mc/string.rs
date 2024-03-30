@@ -13,6 +13,12 @@ impl String {
     }
 }
 
+impl From<&'static str> for String {
+    fn from(value: &'static str) -> Self {
+        Self(std::string::String::from(value))
+    }
+}
+
 impl Serialize for String {
     fn serialize(&self, buffer: &mut bytes::BytesMut) {
         let bytes = self.0.as_bytes();
