@@ -64,10 +64,14 @@ impl ConnectionActor {
             }
 
             if let Packet::LoginAcknowledged = incoming_packet {
-                let _ = self.connection_state_sender
+                let _ = self
+                    .connection_state_sender
                     .send(ConnectionState::Configuration);
 
-                let _ = self.write_packet_handle.send(Packet::FinishConfiguration).await;
+                let _ = self
+                    .write_packet_handle
+                    .send(Packet::FinishConfiguration)
+                    .await;
             }
         }
     }

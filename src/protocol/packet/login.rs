@@ -35,7 +35,6 @@ pub struct LoginSuccessPacket {
 
 impl Default for LoginSuccessPacket {
     fn default() -> Self {
-
         let id = uuid::uuid!("44f348cb-84b0-4fb9-a5c0-8eeb4596d6ba");
         Self {
             uuid: mc::Uuid::from(id),
@@ -67,7 +66,6 @@ impl Deserialize for LoginSuccessPacket {
         })
     }
 }
-
 
 #[derive(Debug)]
 struct Property {

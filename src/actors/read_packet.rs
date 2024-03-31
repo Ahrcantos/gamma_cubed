@@ -27,9 +27,7 @@ impl ReadPacketActor {
                 ConnectionState::Status => handle_status_state(&raw_packet),
                 ConnectionState::Login => handle_login_state(&raw_packet),
                 ConnectionState::Configuration => handle_configuration_state(&raw_packet),
-                _ => {
-                    None
-                }
+                _ => None,
             };
 
             if let Some(packet) = packet {

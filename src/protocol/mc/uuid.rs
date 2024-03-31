@@ -15,7 +15,9 @@ impl Serialize for Uuid {
     fn serialize(&self, buffer: &mut bytes::BytesMut) {
         let [a4, a3, a2, a1, b4, b3, b2, b1, c4, c3, c2, c1, d4, d3, d2, d1] = self.0.to_bytes_le();
 
-        buffer.put_slice(&[a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4]);
+        buffer.put_slice(&[
+            a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4,
+        ]);
     }
 }
 

@@ -30,7 +30,7 @@ impl<'i> Scanner<'i> {
     }
 
     pub fn remaining(&self) -> usize {
-       self.input.len() - self.cursor
+        self.input.len() - self.cursor
     }
 
     pub fn pop(&mut self) -> ParserResult<u8> {

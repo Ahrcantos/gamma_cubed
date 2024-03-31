@@ -1,13 +1,12 @@
-use bytes::{BytesMut, BufMut};
+use bytes::{BufMut, BytesMut};
 
-use crate::parser::{Deserialize, Serialize, Scanner, ParserResult};
+use crate::parser::{Deserialize, ParserResult, Scanner, Serialize};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Long(i64);
 
 impl Deserialize for Long {
     fn deserialize(scanner: &mut Scanner) -> ParserResult<Self> {
-
         let b1 = scanner.pop()?;
         let b2 = scanner.pop()?;
         let b3 = scanner.pop()?;
