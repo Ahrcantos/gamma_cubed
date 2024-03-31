@@ -14,7 +14,8 @@ impl WriteRawPacketActor {
         let mut buffer = BytesMut::new();
         packet.serialize(&mut buffer);
 
-        let _ = self.writer.write(&buffer).await;
+        let _ = self.writer.write_all(&buffer).await;
+        let _ = self.writer.flush().await;
     }
 
     async fn run(mut self) {

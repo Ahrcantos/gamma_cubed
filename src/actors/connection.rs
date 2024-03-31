@@ -29,8 +29,6 @@ struct ConnectionActor {
 impl ConnectionActor {
     async fn run(mut self) {
         while let Some(incoming_packet) = self.read_packet_handle.recv().await {
-            dbg!(&incoming_packet);
-
             if let Packet::Handshake(HandshakePacket { next_state, .. }) = incoming_packet {
                 let state = match next_state {
                     NextState::Status => ConnectionState::Status,
@@ -68,6 +66,8 @@ impl ConnectionActor {
             if let Packet::LoginAcknowledged = incoming_packet {
                 let _ = self.connection_state_sender
                     .send(ConnectionState::Configuration);
+
+                let _ = self.write_packet_handle.send(Packet::FinishConfiguration).await;
             }
         }
     }

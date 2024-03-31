@@ -29,6 +29,10 @@ impl<'i> Scanner<'i> {
         self.input.get(self.cursor).map(|b| *b)
     }
 
+    pub fn remaining(&self) -> usize {
+       self.input.len() - self.cursor
+    }
+
     pub fn pop(&mut self) -> ParserResult<u8> {
         match self.input.get(self.cursor) {
             Some(v) => {
@@ -49,6 +53,10 @@ impl<'i> Scanner<'i> {
             }
             None => Err(ParserError::NotEnough),
         }
+    }
+
+    pub fn pop_remaining(&mut self) -> ParserResult<&'i [u8]> {
+        self.pop_many(self.remaining())
     }
 }
 

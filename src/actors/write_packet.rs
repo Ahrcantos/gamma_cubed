@@ -20,7 +20,6 @@ impl WritePacketActor {
             packet.serialize(&mut buffer);
             let packet_id = VarInt::new(packet.packet_id());
             let raw_packet = RawPacket::new(packet_id, buffer.freeze());
-            dbg!(&raw_packet);
 
             self.write_raw_packet_handle.send(raw_packet).await;
         }
