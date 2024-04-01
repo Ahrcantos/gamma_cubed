@@ -6,6 +6,8 @@ pub mod login;
 pub mod ping;
 pub mod status;
 
+use std::fmt::Display;
+
 use crate::parser::Serialize;
 
 use self::config::ServerboundPluginMessagePacket;
@@ -74,6 +76,26 @@ impl Serialize for Packet {
             Self::ServerboundPluginMessage(_) => {}
             Self::FinishConfiguration => {}
             Self::AcknowledgeFinishConfiguration => {}
+        }
+    }
+}
+
+impl Display for Packet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Handshake(_) => write!(f, "Handshake"),
+            Self::StatusRequest => write!(f, "StatusRequest"),
+            Self::StatusResponse(_) => write!(f, "StatusResponse"),
+            Self::PingRequest(_) => write!(f, "PingRequest"),
+            Self::PingResponse(_) => write!(f, "PingResponse"),
+            Self::LoginStart(_) => write!(f, "LoginStart"),
+            Self::Disconnect(_) => write!(f, "Disconnect"),
+            Self::EncryptionRequest(_) => write!(f, "EncryptionRequest"),
+            Self::LoginSuccess(_) => write!(f, "LoginSuccess"),
+            Self::LoginAcknowledged => write!(f, "LoginAcknowledged"),
+            Self::ServerboundPluginMessage(_) => write!(f, "ServerboundPluginMessage"),
+            Self::FinishConfiguration => write!(f, "FinishConfiguration"),
+            Self::AcknowledgeFinishConfiguration => write!(f, "AcknowledgeFinishConfiguration"),
         }
     }
 }

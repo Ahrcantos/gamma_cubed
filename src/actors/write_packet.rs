@@ -1,5 +1,6 @@
 use bytes::BytesMut;
 use tokio::{net::tcp::OwnedWriteHalf, sync::mpsc};
+use tracing::Instrument;
 
 use crate::{
     parser::Serialize,
@@ -22,6 +23,7 @@ impl WritePacketActor {
             let raw_packet = RawPacket::new(packet_id, buffer.freeze());
 
             self.write_raw_packet_handle.send(raw_packet).await;
+            tracing::info!("WRITE: {}", &packet);
         }
     }
 }
@@ -41,12 +43,14 @@ impl WritePacketActorHandle {
             packet_receiver,
         };
 
-        tokio::spawn(actor.run());
+        tokio::spawn(actor.run().instrument(tracing::info_span!("write_packet")));
 
         Self { packet_sender }
     }
 
     pub async fn send(&mut self, packet: Packet) {
-        let _ = self.packet_sender.send(packet).await;
+        let _ = self.packet_sender.send(packet).await.map_err(|err| {
+            tracing::error!("{err}");
+        });
     }
 }

@@ -31,7 +31,10 @@ impl ReadPacketActor {
             };
 
             if let Some(packet) = packet {
-                let _ = self.packet_sender.send(packet).await;
+                tracing::info!("READ: {}", &packet);
+                let _ = self.packet_sender.send(packet).await.map_err(|err| {
+                    tracing::error!("{}", err);
+                });
             }
         }
     }

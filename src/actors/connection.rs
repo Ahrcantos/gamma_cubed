@@ -1,4 +1,7 @@
+use std::fmt::Display;
+
 use tokio::{net::TcpStream, sync::watch};
+use tracing::Instrument;
 
 use crate::protocol::{
     packet::{
@@ -20,6 +23,17 @@ pub enum ConnectionState {
     Configuration,
 }
 
+impl Display for ConnectionState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Handshake => write!(f, "Handshake"),
+            Self::Status => write!(f, "Status"),
+            Self::Login => write!(f, "Login"),
+            Self::Configuration => write!(f, "Configuration"),
+        }
+    }
+}
+
 struct ConnectionActor {
     connection_state_sender: watch::Sender<ConnectionState>,
     read_packet_handle: ReadPacketActorHandle,
@@ -36,6 +50,7 @@ impl ConnectionActor {
                 };
 
                 let _ = self.connection_state_sender.send(state);
+                tracing::info!("Transitioning to state: {}", state);
                 continue;
             }
 
@@ -56,8 +71,7 @@ impl ConnectionActor {
             }
 
             if let Packet::LoginStart(_) = incoming_packet {
-                let _ = self
-                    .write_packet_handle
+                self.write_packet_handle
                     .send(Packet::LoginSuccess(LoginSuccessPacket::default()))
                     .await;
                 continue;
@@ -66,10 +80,14 @@ impl ConnectionActor {
             if let Packet::LoginAcknowledged = incoming_packet {
                 let _ = self
                     .connection_state_sender
-                    .send(ConnectionState::Configuration);
+                    .send(ConnectionState::Configuration)
+                    .map_err(|err| {
+                        tracing::error!("{err}");
+                    });
 
-                let _ = self
-                    .write_packet_handle
+                tracing::info!("Transitioning to state: {}", ConnectionState::Configuration);
+
+                self.write_packet_handle
                     .send(Packet::FinishConfiguration)
                     .await;
             }
@@ -98,7 +116,7 @@ impl ConnectionActorHandle {
             write_packet_handle,
         };
 
-        tokio::spawn(actor.run());
+        tokio::spawn(actor.run().instrument(tracing::info_span!("connection")));
 
         Self {
             connection_state_receiver,
